@@ -1,62 +1,34 @@
 define(
     [
         'jquery',
-        "underscore",
-        'Magento_Ui/js/form/form',
         'ko',
         'Magento_Customer/js/model/customer',
-        'Magento_Customer/js/model/address-list',
-        'Magento_Checkout/js/model/address-converter',
         'Magento_Checkout/js/model/quote',
-        'Magento_Checkout/js/action/create-shipping-address',
-        'Magento_Checkout/js/action/select-shipping-address',
-        'Magento_Checkout/js/model/shipping-rates-validator',
-        'Magento_Checkout/js/model/shipping-address/form-popup-state',
-        'Magento_Checkout/js/model/shipping-service',
         'Magento_Checkout/js/action/select-shipping-method',
-        'Magento_Checkout/js/model/shipping-rate-registry',
-        'Parcelpro_Shipment/js/action/set-shipping-information-mixin',
-        'Magento_Checkout/js/model/step-navigator',
         'Magento_Ui/js/modal/modal',
-        'Magento_Checkout/js/model/checkout-data-resolver',
         'Magento_Checkout/js/checkout-data',
-        'uiRegistry',
-        'mage/translate',
-        'Magento_Checkout/js/model/shipping-rate-service'
+        'uiRegistry'
     ],
     function (
         $,
-        _,
-        Component,
         ko,
         customer,
-        addressList,
-        addressConverter,
         quote,
-        createShippingAddress,
-        selectShippingAddress,
-        shippingRatesValidator,
-        formPopUpState,
-        shippingService,
         selectShippingMethodAction,
-        rateRegistry,
-        setShippingInformationAction,
-        stepNavigator,
         modal,
-        checkoutDataResolver,
         checkoutData,
-        registry,
-        $t
+        registry
     ) {
         'use strict';
 
         var popUp = null;
         var locatiekiezerHost = "https://login.parcelpro.nl";
+
         function ParcelProKiezerUrl() {
             var postcode = null;
             var street = null;
 
-            if(window.isCustomerLoggedIn) {
+            if (window.isCustomerLoggedIn) {
                 if (typeof checkoutData.getShippingAddressFromData() !== "undefined"
                     && checkoutData.getShippingAddressFromData() !== null
                     && checkoutData.getSelectedShippingAddress() == 'new-customer-address'
@@ -64,20 +36,20 @@ define(
                     postcode = checkoutData.getShippingAddressFromData().postcode;
                     street = checkoutData.getShippingAddressFromData().street;
                 } else {
-                    if(checkoutData.getSelectedShippingAddress() != null){
+                    if (checkoutData.getSelectedShippingAddress() != null) {
                         var parts = checkoutData.getSelectedShippingAddress().split('customer-address');
-                        postcode = window.customerData.addresses[ ( parts[1] -1 ) ].postcode;
-                        street = window.customerData.addresses[ ( parts[1] -1 ) ].street[0];
-                    }else{
-                        if(window.customerData.addresses.length >=1 ){
+                        postcode = window.customerData.addresses[(parts[1] - 1)].postcode;
+                        street = window.customerData.addresses[(parts[1] - 1)].street[0];
+                    } else {
+                        if (window.customerData.addresses.length >= 1) {
                             postcode = window.customerData.addresses[0].postcode;
                             street = window.customerData.addresses[0].street[0];
-                        }else{
+                        } else {
                             postcode = (jQuery('input[name=postcode]').val() != '' ? jQuery('input[name=postcode]').val() : '');
                         }
                     }
                 }
-            }else{
+            } else {
                 postcode = jQuery('input[name=postcode]').val();
                 street = jQuery('input[name^=street]').first().val();
             }
@@ -144,14 +116,6 @@ define(
                 defaults: {
                     template: 'Parcelpro_Shipment/shipping'
                 },
-                visible: ko.observable(!quote.isVirtual()),
-                errorValidationMessage: ko.observable(false),
-                isCustomerLoggedIn: customer.isLoggedIn,
-                isFormPopUpVisible: formPopUpState.isVisible,
-                isFormInline: addressList().length == 0,
-                isNewAddressAdded: ko.observable(false),
-                saveInAddressBook: true,
-                quoteIsVirtual: quote.isVirtual(),
 
                 initialize: function () {
                     this._super();
@@ -162,7 +126,7 @@ define(
                         }
                     });
 
-                    if(window.checkoutConfig.selectedShippingMethod && (window.checkoutConfig.selectedShippingMethod.method_code == 'postnl_pakjegemak' || window.checkoutConfig.selectedShippingMethod.method_code == 'dhl_parcelshop')){
+                    if (window.checkoutConfig.selectedShippingMethod && (window.checkoutConfig.selectedShippingMethod.method_code == 'postnl_pakjegemak' || window.checkoutConfig.selectedShippingMethod.method_code == 'dhl_parcelshop')) {
                         checkoutData.setShippingAddressFromData(window.checkoutConfig.billingAddressFromData);
                     }
 
@@ -183,17 +147,17 @@ define(
 
                 isSelected: ko.computed(function () {
                         // Parcel Pro Afhaalpunt
-                        if($('#modal').is(':visible')) return false;
+                        if ($('#modal').is(':visible')) return false;
                         var postcode = null;
                         var street = null;
 
-                        if(customer.isLoggedIn()){
+                        if (customer.isLoggedIn()) {
                             if (typeof checkoutData.getShippingAddressFromData() !== "undefined"
                                 && checkoutData.getShippingAddressFromData() !== null) {
                                 postcode = checkoutData.getShippingAddressFromData().postcode;
                                 street = checkoutData.getShippingAddressFromData().street;
-                            } else if(customer.isLoggedIn()) {
-                                if(customer.customerData.addresses.length >= 1 ){
+                            } else if (customer.isLoggedIn()) {
+                                if (customer.customerData.addresses.length >= 1) {
                                     postcode = customer.customerData.addresses[0].postcode;
                                     street = customer.customerData.addresses[0].street[0];
                                 }
@@ -206,45 +170,33 @@ define(
                     }
                 ),
 
-
-                selectShippingMethod: function(shippingMethod) {
+                selectShippingMethod: function (shippingMethod) {
                     selectShippingMethodAction(shippingMethod);
                     checkoutData.setSelectedShippingRate(shippingMethod.carrier_code + '_' + shippingMethod.method_code);
-                    if(shippingMethod.method_code =="postnl_pakjegemak"){
+                    if (shippingMethod.method_code == "postnl_pakjegemak") {
                         jQuery('#modal').show();
                         jQuery('#afhaalpunt_frame').attr('src', ParcelProKiezerUrl() + '&carrier=PostNL');
                     }
-                    if(shippingMethod.method_code =="dhl_parcelshop"){
+                    if (shippingMethod.method_code == "dhl_parcelshop") {
                         jQuery('#modal').show();
                         jQuery('#afhaalpunt_frame').attr('src', ParcelProKiezerUrl() + '&carrier=DHL');
                     }
-                    if(shippingMethod.method_code =="dpd_parcelshop"){
+                    if (shippingMethod.method_code == "dpd_parcelshop") {
                         jQuery('#modal').show();
                         jQuery('#afhaalpunt_frame').attr('src', ParcelProKiezerUrl() + '&carrier=DPD');
                     }
                     return true;
                 },
 
-                setShippingInformation: function () {
-                    if (this.validateShippingInformation()) {
-                        setShippingInformationAction().done(
-                            function() {
-                                stepNavigator.next();
-                            }
-                        );
-                    }
-                },
-
-
                 validateShippingInformation: function () {
                     var result;
-                    if(quote.shippingMethod()){
-                      if (quote.shippingMethod().method_code == "postnl_pakjegemak" || quote.shippingMethod().method_code == "dhl_parcelshop" || quote.shippingMethod().method_code == "dpd_parcelshop" ) {
-                          if (jQuery("#shipping_method\\:company").val() === "") {
-                              this.errorValidationMessage('Selecteer een afhaallocatie of een andere verzendmethode');
-                              return false;
-                          }
-                      }
+                    if (quote.shippingMethod()) {
+                        if (quote.shippingMethod().method_code == "postnl_pakjegemak" || quote.shippingMethod().method_code == "dhl_parcelshop" || quote.shippingMethod().method_code == "dpd_parcelshop") {
+                            if (jQuery("#shipping_method\\:company").val() === "") {
+                                this.errorValidationMessage('Selecteer een afhaallocatie of een andere verzendmethode');
+                                return false;
+                            }
+                        }
                     }
 
                     return this._super();
