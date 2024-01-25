@@ -7,6 +7,9 @@ use Magento\Shipping\Model\Rate\Result;
 class Parcelpro extends \Magento\Shipping\Model\Carrier\AbstractCarrier implements
     \Magento\Shipping\Model\Carrier\CarrierInterface
 {
+    public $_rateResultFactory;
+    public $_rateMethodFactory;
+    public $serialize;
     /**
      * @var string
      */

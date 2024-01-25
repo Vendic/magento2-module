@@ -5,6 +5,7 @@ namespace Parcelpro\Shipment\Block\Adminhtml\Order\View\Tab;
 
 class Custom extends \Magento\Backend\Block\Template implements \Magento\Backend\Block\Widget\Tab\TabInterface
 {
+    public $serialize;
     /**
      * Template
      *

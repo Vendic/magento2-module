@@ -5,6 +5,7 @@ use Parcelpro\Shipment\Model\ParcelproFactory;
 
 class PluginBefore
 {
+    public $_request;
     protected $_url = 'https://login.parcelpro.nl';
 
     public function beforePushButtons(

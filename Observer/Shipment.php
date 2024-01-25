@@ -6,6 +6,7 @@ use Parcelpro\Shipment\Model\ParcelproFactory;
 
 class Shipment implements ObserverInterface {
 
+    public $messageManager;
     /** @var \Magento\Framework\Logger\Monolog */
     protected $logger;
     protected $scopeConfig;
